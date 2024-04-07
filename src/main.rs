@@ -8,7 +8,7 @@ async fn main() {
 
     #[cfg(debug_assertions)]
     {
-        println!("Debug mode is enabled. Skipping the check for scoop-rs installation.");
+        println!("Debug mode is enabled. Skipping the check for scoop-rs installation.\n");
         cli::start().await;
         return;
     }

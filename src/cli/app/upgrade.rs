@@ -4,9 +4,9 @@ use crate::cli::CliResult;
 
 #[derive(Debug, Args)]
 pub struct UpgradeArgs {
-    /// The package to upgrade
+    /// The app to upgrade
     /// If no package is specified, all packages are upgraded
-    package: Option<String>,
+    name: Option<Vec<String>>,
 }
 
 pub async fn start(opts: UpgradeArgs) -> CliResult {

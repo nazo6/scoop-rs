@@ -5,95 +5,95 @@ use std::{collections::HashMap, marker::PhantomData};
 pub struct Manifest {
     /// A comment.
     #[serde(rename = "##", deserialize_with = "string_or_seq_string")]
-    empty: Vec<String>,
+    pub empty: Vec<String>,
     #[serde(rename = "$schema")]
-    schema: Option<String>,
+    pub schema: Option<String>,
     /// Deprecated. Use ## instead.
     #[serde(rename = "_comment", deserialize_with = "string_or_seq_string")]
-    comment: Vec<String>,
-    architecture: Option<ManifestArchitecture>,
-    autoupdate: Option<Autoupdate>,
+    pub comment: Vec<String>,
+    pub architecture: Option<ManifestArchitecture>,
+    pub autoupdate: Option<Autoupdate>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    bin: Vec<String>,
-    checkver: Option<Checkver>,
+    pub bin: Vec<String>,
+    pub checkver: Option<Checkver>,
     /// Undocumented: Found at https://github.com/se35710/scoop-java/search?l=JSON&q=cookie
-    cookie: Option<HashMap<String, Option<serde_json::Value>>>,
+    pub cookie: Option<HashMap<String, Option<serde_json::Value>>>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    depends: Vec<String>,
-    description: Option<String>,
+    pub depends: Vec<String>,
+    pub description: Option<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    env_add_path: Vec<String>,
-    env_set: Option<HashMap<String, Option<serde_json::Value>>>,
+    pub env_add_path: Vec<String>,
+    pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    extract_dir: Vec<String>,
+    pub extract_dir: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    extract_to: Vec<String>,
-    hash: Option<Hash>,
-    homepage: String,
+    pub extract_to: Vec<String>,
+    pub hash: Option<Hash>,
+    pub homepage: String,
     /// True if the installer InnoSetup based. Found in
     /// https://github.com/ScoopInstaller/Main/search?l=JSON&q=innosetup
-    innosetup: Option<bool>,
-    installer: Option<ManifestInstaller>,
-    license: ManifestLicense,
+    pub innosetup: Option<bool>,
+    pub installer: Option<ManifestInstaller>,
+    pub license: ManifestLicense,
     /// Deprecated
     #[serde(deserialize_with = "string_or_seq_string")]
-    msi: Vec<String>,
+    pub msi: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    notes: Vec<String>,
-    persist: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
+    pub notes: Vec<String>,
+    pub persist: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    post_install: Vec<String>,
+    pub post_install: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    post_uninstall: Vec<String>,
+    pub post_uninstall: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    pre_install: Vec<String>,
+    pub pre_install: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    pre_uninstall: Vec<String>,
-    psmodule: Option<ManifestPsmodule>,
-    shortcuts: Option<Vec<Vec<String>>>,
-    suggest: Option<Suggest>,
-    uninstaller: Option<Uninstaller>,
+    pub pre_uninstall: Vec<String>,
+    pub psmodule: Option<ManifestPsmodule>,
+    pub shortcuts: Option<Vec<Vec<String>>>,
+    pub suggest: Option<Suggest>,
+    pub uninstaller: Option<Uninstaller>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    url: Vec<String>,
-    version: String,
+    pub url: Vec<String>,
+    pub version: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct ManifestArchitecture {
     #[serde(rename = "32bit")]
-    the_32_bit: Option<The32BitClass>,
+    pub the_32_bit: Option<The32BitClass>,
     #[serde(rename = "64bit")]
-    the_64_bit: Option<The32BitClass>,
-    arm64: Option<The32BitClass>,
+    pub the_64_bit: Option<The32BitClass>,
+    pub arm64: Option<The32BitClass>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct The32BitClass {
     #[serde(deserialize_with = "string_or_seq_string")]
-    bin: Vec<String>,
-    checkver: Option<Checkver>,
+    pub bin: Vec<String>,
+    pub checkver: Option<Checkver>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    env_add_path: Vec<String>,
-    env_set: Option<HashMap<String, Option<serde_json::Value>>>,
+    pub env_add_path: Vec<String>,
+    pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    extract_dir: Vec<String>,
-    hash: Option<Hash>,
-    installer: Option<ManifestInstaller>,
+    pub extract_dir: Vec<String>,
+    pub hash: Option<Hash>,
+    pub installer: Option<ManifestInstaller>,
     /// Deprecated
     #[serde(deserialize_with = "string_or_seq_string")]
-    msi: Vec<String>,
+    pub msi: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    post_install: Vec<String>,
+    pub post_install: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    post_uninstall: Vec<String>,
+    pub post_uninstall: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    pre_install: Vec<String>,
+    pub pre_install: Vec<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    pre_uninstall: Vec<String>,
-    shortcuts: Option<Vec<Vec<String>>>,
-    uninstaller: Option<Uninstaller>,
+    pub pre_uninstall: Vec<String>,
+    pub shortcuts: Option<Vec<Vec<String>>>,
+    pub uninstaller: Option<Uninstaller>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    url: Vec<String>,
+    pub url: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -124,24 +124,24 @@ pub enum CheckverTemplate {
 
 #[derive(Serialize, Deserialize)]
 pub struct CheckverClass {
-    github: Option<String>,
+    pub github: Option<String>,
     /// Same as 'jsonpath'
-    jp: Option<String>,
-    jsonpath: Option<String>,
+    pub jp: Option<String>,
+    pub jsonpath: Option<String>,
     /// Same as 'regex'
-    re: Option<String>,
-    regex: Option<String>,
+    pub re: Option<String>,
+    pub regex: Option<String>,
     /// Allows rearrange the regexp matches
-    replace: Option<String>,
+    pub replace: Option<String>,
     /// Reverse the order of regex matches
-    reverse: Option<bool>,
+    pub reverse: Option<bool>,
     /// Custom PowerShell script to retrieve application version using more complex approach.
     #[serde(deserialize_with = "string_or_seq_string")]
-    script: Vec<String>,
-    sourceforge: Option<SourceforgeUnion>,
-    url: Option<String>,
-    useragent: Option<String>,
-    xpath: Option<String>,
+    pub script: Vec<String>,
+    pub sourceforge: Option<SourceforgeUnion>,
+    pub url: Option<String>,
+    pub useragent: Option<String>,
+    pub xpath: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -153,8 +153,8 @@ pub enum SourceforgeUnion {
 
 #[derive(Serialize, Deserialize)]
 pub struct SourceforgeClass {
-    path: Option<String>,
-    project: Option<String>,
+    pub path: Option<String>,
+    pub project: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -168,67 +168,67 @@ pub enum Hash {
 pub struct ManifestInstaller {
     /// Undocumented: only used in scoop-extras/oraclejdk* and scoop-extras/appengine-go
     #[serde(rename = "_comment")]
-    comment: Option<String>,
+    pub comment: Option<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    args: Vec<String>,
-    file: Option<String>,
-    keep: Option<bool>,
+    pub args: Vec<String>,
+    pub file: Option<String>,
+    pub keep: Option<bool>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    script: Vec<String>,
+    pub script: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Uninstaller {
     #[serde(deserialize_with = "string_or_seq_string")]
-    args: Vec<String>,
-    file: Option<String>,
+    pub args: Vec<String>,
+    pub file: Option<String>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    script: Vec<String>,
+    pub script: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Autoupdate {
-    architecture: Option<AutoupdateArchitecture>,
-    bin: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
+    pub architecture: Option<AutoupdateArchitecture>,
+    pub bin: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    env_add_path: Vec<String>,
-    env_set: Option<HashMap<String, Option<serde_json::Value>>>,
+    pub env_add_path: Vec<String>,
+    pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    extract_dir: Vec<String>,
-    hash: Option<HashExtractionOrArrayOfHashExtractions>,
-    installer: Option<AutoupdateInstaller>,
-    license: Option<AutoupdateLicense>,
+    pub extract_dir: Vec<String>,
+    pub hash: Option<HashExtractionOrArrayOfHashExtractions>,
+    pub installer: Option<AutoupdateInstaller>,
+    pub license: Option<AutoupdateLicense>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    notes: Vec<String>,
-    persist: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
-    psmodule: Option<AutoupdatePsmodule>,
-    shortcuts: Option<Vec<Vec<String>>>,
+    pub notes: Vec<String>,
+    pub persist: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
+    pub psmodule: Option<AutoupdatePsmodule>,
+    pub shortcuts: Option<Vec<Vec<String>>>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    url: Vec<String>,
+    pub url: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct AutoupdateArchitecture {
     #[serde(rename = "32bit")]
-    the_32_bit: Option<AutoupdateArch>,
+    pub the_32_bit: Option<AutoupdateArch>,
     #[serde(rename = "64bit")]
-    the_64_bit: Option<AutoupdateArch>,
-    arm64: Option<AutoupdateArch>,
+    pub the_64_bit: Option<AutoupdateArch>,
+    pub arm64: Option<AutoupdateArch>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct AutoupdateArch {
-    bin: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
+    pub bin: Option<StringOrArrayOfStringsOrAnArrayOfArrayOfStrings>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    env_add_path: Vec<String>,
-    env_set: Option<HashMap<String, Option<serde_json::Value>>>,
+    pub env_add_path: Vec<String>,
+    pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    extract_dir: Vec<String>,
-    hash: Option<HashExtractionOrArrayOfHashExtractions>,
-    installer: Option<PurpleInstaller>,
-    shortcuts: Option<Vec<Vec<String>>>,
+    pub extract_dir: Vec<String>,
+    pub hash: Option<HashExtractionOrArrayOfHashExtractions>,
+    pub installer: Option<PurpleInstaller>,
+    pub shortcuts: Option<Vec<Vec<String>>>,
     #[serde(deserialize_with = "string_or_seq_string")]
-    url: Vec<String>,
+    pub url: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -241,17 +241,17 @@ pub enum HashExtractionOrArrayOfHashExtractions {
 #[derive(Serialize, Deserialize)]
 pub struct HashExtraction {
     /// Same as 'regex'
-    find: Option<String>,
+    pub find: Option<String>,
     /// Same as 'jsonpath'
-    jp: Option<String>,
-    jsonpath: Option<String>,
-    mode: Option<Mode>,
-    regex: Option<String>,
+    pub jp: Option<String>,
+    pub jsonpath: Option<String>,
+    pub mode: Option<Mode>,
+    pub regex: Option<String>,
     /// Deprecated, hash type is determined automatically
     #[serde(rename = "type")]
-    hash_extraction_type: Option<Type>,
-    url: Option<String>,
-    xpath: Option<String>,
+    pub hash_extraction_type: Option<Type>,
+    pub url: Option<String>,
+    pub xpath: Option<String>,
 }
 
 /// Deprecated, hash type is determined automatically
@@ -279,12 +279,12 @@ pub enum Mode {
 
 #[derive(Serialize, Deserialize)]
 pub struct PurpleInstaller {
-    file: Option<String>,
+    pub file: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct AutoupdateInstaller {
-    file: Option<String>,
+    pub file: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -296,13 +296,13 @@ pub enum AutoupdateLicense {
 
 #[derive(Serialize, Deserialize)]
 pub struct License {
-    identifier: String,
-    url: Option<String>,
+    pub identifier: String,
+    pub url: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct AutoupdatePsmodule {
-    name: Option<String>,
+    pub name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -314,7 +314,7 @@ pub enum ManifestLicense {
 
 #[derive(Serialize, Deserialize)]
 pub struct ManifestPsmodule {
-    name: Option<String>,
+    pub name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
