@@ -2,8 +2,9 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::val::INSTALL_PATH;
+use crate::Context as _;
 
 use super::{bucket::Bucket, manifest::Manifest};
 
@@ -102,10 +103,12 @@ impl AppVersion<'_> {
         path.push("install.json");
 
         let content = tokio::fs::read_to_string(&path).await?;
-        Ok(serde_json::from_str(&content)?)
+        serde_json::from_str(&content).map_err(|e| Error::JsonParse("install.json", e))
     }
     /// Get the manifest of this install
     pub async fn manifest(&self) -> Result<Manifest> {
-        Ok(Manifest::from_path(&self.path().join("manifest.json")).await?)
+        Manifest::from_path(&self.path().join("manifest.json"))
+            .await
+            .with_context(|| format!("Failed to get manifest of {}", self.version))
     }
 }

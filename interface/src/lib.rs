@@ -4,3 +4,5 @@ pub mod error;
 pub mod installed_app;
 pub mod manifest;
 pub mod val;
+
+use error::*;

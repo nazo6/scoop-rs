@@ -5,6 +5,7 @@ use crate::{error::Result, val::INSTALL_PATH};
 use super::{bucket::Bucket, installed_app::InstalledApp, manifest::Manifest};
 
 /// Structure that represent one app in a bucket
+#[derive(Eq, PartialEq, Hash, Clone, Debug)]
 pub struct BucketApp<'a> {
     pub name: String,
     pub bucket: &'a Bucket,

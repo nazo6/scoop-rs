@@ -15,7 +15,7 @@ pub async fn get_buckets() -> Result<Vec<Bucket>> {
     Ok(buckets)
 }
 
-#[derive(Hash, PartialEq, Eq, Serialize, Deserialize, Clone)]
+#[derive(Hash, PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 #[serde(transparent)]
 pub struct Bucket {
     pub name: String,
@@ -43,7 +43,12 @@ impl Bucket {
         let mut reader = tokio::fs::read_dir(self.path().join("bucket")).await?;
         while let Ok(Some(entry)) = reader.next_entry().await {
             let app = BucketApp {
-                name: entry.file_name().to_str().unwrap().to_string(),
+                name: entry
+                    .path()
+                    .file_stem()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string(),
                 bucket: self,
             };
             apps.push(app);
