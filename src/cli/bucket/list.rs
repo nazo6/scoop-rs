@@ -1,17 +1,17 @@
 use tabled::settings::Style;
 
-use crate::{cli::CliResult, interface::bucket::BucketList};
+use crate::{cli::CliResult, interface::bucket::get_buckets};
 
 pub async fn start() -> CliResult {
     println!("List of buckets");
-    let buckets = BucketList::load()
+    let buckets = get_buckets()
         .await
         .map_err(|e| format!("Failed to get buckets: {}", e))?;
 
     let mut builder = tabled::builder::Builder::default();
     builder.push_record(["Name", "Url"]);
 
-    for bucket in buckets.buckets {
+    for bucket in buckets {
         let remote_url = if let Ok(repo) = bucket.repository() {
             repo.find_remote("origin")
                 .ok()

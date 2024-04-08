@@ -4,7 +4,7 @@ mod val;
 
 #[tokio::main]
 async fn main() {
-    let scoop = interface::app::App::from_name("scoop");
+    let scoop = interface::installed_app::InstalledApp::from_name("scoop");
 
     #[cfg(debug_assertions)]
     {

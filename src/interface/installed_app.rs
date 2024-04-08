@@ -7,27 +7,27 @@ use crate::val::INSTALL_PATH;
 
 use super::{bucket::Bucket, manifest::Manifest};
 
-pub async fn installed_apps() -> Result<Vec<App>, anyhow::Error> {
+pub async fn installed_apps() -> Result<Vec<InstalledApp>, anyhow::Error> {
     let mut apps = Vec::new();
     let mut readdir = tokio::fs::read_dir(INSTALL_PATH.clone().join("apps"))
         .await
         .context("Failed to read apps directory")?;
     while let Ok(Some(entry)) = readdir.next_entry().await {
         if let Some(name) = entry.file_name().to_str() {
-            apps.push(App::from_name(name));
+            apps.push(InstalledApp::from_name(name));
         }
     }
     Ok(apps)
 }
 
 /// Structure that represent one installed app
-pub struct App {
+pub struct InstalledApp {
     pub name: String,
 }
 
-impl App {
+impl InstalledApp {
     pub fn from_name(name: &str) -> Self {
-        App {
+        InstalledApp {
             name: name.to_string(),
         }
     }
@@ -90,7 +90,7 @@ pub struct AppInstallInfo {
 
 /// Structure that represent one installed app version
 pub struct AppVersion<'a> {
-    app: &'a App,
+    app: &'a InstalledApp,
     pub version: String,
 }
 
