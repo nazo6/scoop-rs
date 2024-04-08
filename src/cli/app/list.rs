@@ -1,6 +1,7 @@
+use interface::installed_app::installed_apps;
 use tabled::{builder::Builder, settings::Style};
 
-use crate::{cli::CliResult, interface::installed_app::installed_apps};
+use crate::cli::CliResult;
 
 pub async fn start() -> CliResult {
     println!("List of installed apps");

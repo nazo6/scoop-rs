@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 
+use crate::error::Result;
 use crate::val::INSTALL_PATH;
 
 use super::bucket_app::BucketApp;
 
-pub async fn get_buckets() -> Result<Vec<Bucket>, anyhow::Error> {
+pub async fn get_buckets() -> Result<Vec<Bucket>> {
     let mut buckets = Vec::new();
     let mut reader = tokio::fs::read_dir(INSTALL_PATH.clone().join("buckets")).await?;
     while let Ok(Some(entry)) = reader.next_entry().await {
@@ -32,12 +33,12 @@ impl Bucket {
     }
 
     /// Get the git repository of the bucket
-    pub fn repository(&self) -> Result<git2::Repository, git2::Error> {
+    pub fn repository(&self) -> std::result::Result<git2::Repository, git2::Error> {
         git2::Repository::open(self.path())
     }
 
     /// Get list of apps in the bucket
-    pub async fn apps(&self) -> Result<Vec<BucketApp>, anyhow::Error> {
+    pub async fn apps(&self) -> Result<Vec<BucketApp>> {
         let mut apps = Vec::new();
         let mut reader = tokio::fs::read_dir(self.path().join("bucket")).await?;
         while let Ok(Some(entry)) = reader.next_entry().await {

@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
 use clap::Args;
+use interface::bucket::get_buckets;
 
-use crate::{cli::CliResult, interface::bucket::get_buckets};
+use crate::cli::CliResult;
 
 mod deps;
 

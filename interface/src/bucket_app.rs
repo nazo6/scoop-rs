@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::val::INSTALL_PATH;
+use crate::{error::Result, val::INSTALL_PATH};
 
 use super::{bucket::Bucket, installed_app::InstalledApp, manifest::Manifest};
 
@@ -30,7 +30,7 @@ impl BucketApp<'_> {
         }
     }
 
-    pub async fn manifest(&self) -> Result<Manifest, anyhow::Error> {
+    pub async fn manifest(&self) -> Result<Manifest> {
         let manifest_path = self
             .bucket
             .path()

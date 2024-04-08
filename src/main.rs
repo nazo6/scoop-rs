@@ -1,17 +1,15 @@
 mod cli;
-mod interface;
-mod val;
 
 #[tokio::main]
 async fn main() {
-    let scoop = interface::installed_app::InstalledApp::from_name("scoop");
-
     #[cfg(debug_assertions)]
     {
         println!("Debug mode is enabled. Skipping the check for scoop-rs installation.\n");
         cli::start().await;
         return;
     }
+
+    let scoop = interface::installed_app::InstalledApp::from_name("scoop");
 
     if scoop.is_installed().await {
         let versions = scoop

@@ -1,6 +1,7 @@
+use interface::bucket::get_buckets;
 use tabled::settings::Style;
 
-use crate::{cli::CliResult, interface::bucket::get_buckets};
+use crate::cli::CliResult;
 
 pub async fn start() -> CliResult {
     println!("List of buckets");

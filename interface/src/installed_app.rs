@@ -1,17 +1,15 @@
 use std::path::PathBuf;
 
-use anyhow::Context;
 use serde::{Deserialize, Serialize};
 
+use crate::error::Result;
 use crate::val::INSTALL_PATH;
 
 use super::{bucket::Bucket, manifest::Manifest};
 
-pub async fn installed_apps() -> Result<Vec<InstalledApp>, anyhow::Error> {
+pub async fn installed_apps() -> Result<Vec<InstalledApp>> {
     let mut apps = Vec::new();
-    let mut readdir = tokio::fs::read_dir(INSTALL_PATH.clone().join("apps"))
-        .await
-        .context("Failed to read apps directory")?;
+    let mut readdir = tokio::fs::read_dir(INSTALL_PATH.clone().join("apps")).await?;
     while let Ok(Some(entry)) = readdir.next_entry().await {
         if let Some(name) = entry.file_name().to_str() {
             apps.push(InstalledApp::from_name(name));
@@ -45,7 +43,7 @@ impl InstalledApp {
         path.exists()
     }
 
-    pub async fn versions(&self) -> Result<Vec<AppVersion>, anyhow::Error> {
+    pub async fn versions(&self) -> Result<Vec<AppVersion>> {
         let mut path = INSTALL_PATH.clone();
         path.push(&self.name);
         let mut versions = Vec::new();
@@ -65,14 +63,15 @@ impl InstalledApp {
         Ok(versions)
     }
 
-    pub async fn current_version(&self) -> Result<AppVersion, anyhow::Error> {
+    pub async fn current_version(&self) -> Result<AppVersion> {
         let path = self.path().join("current");
         if !path.exists() {
-            return Err(anyhow::anyhow!("App not installed or install is corrupted"));
+            return Err(crate::error::Error::InvalidState(
+                "No current version".to_string(),
+            ));
         }
         let version = tokio::fs::read_link(&path)
-            .await
-            .context("Failed to read link")?
+            .await?
             .file_name()
             .unwrap()
             .to_str()
@@ -98,17 +97,15 @@ impl AppVersion<'_> {
     pub fn path(&self) -> PathBuf {
         self.app.path().join(&self.version)
     }
-    pub async fn install_info(&self) -> Result<AppInstallInfo, anyhow::Error> {
+    pub async fn install_info(&self) -> Result<AppInstallInfo> {
         let mut path = self.path();
         path.push("install.json");
 
-        let content = tokio::fs::read_to_string(&path)
-            .await
-            .context("Failed to read install.json")?;
-        serde_json::from_str(&content).context("Failed to parse install.json")
+        let content = tokio::fs::read_to_string(&path).await?;
+        Ok(serde_json::from_str(&content)?)
     }
     /// Get the manifest of this install
-    pub async fn manifest(&self) -> Result<Manifest, anyhow::Error> {
-        Manifest::from_path(&self.path().join("manifest.json")).await
+    pub async fn manifest(&self) -> Result<Manifest> {
+        Ok(Manifest::from_path(&self.path().join("manifest.json")).await?)
     }
 }
