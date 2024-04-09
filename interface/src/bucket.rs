@@ -1,3 +1,4 @@
+use async_walkdir::{Filtering, WalkDir};
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
@@ -40,19 +41,29 @@ impl Bucket {
     /// Get list of apps in the bucket
     pub async fn apps(&self) -> Result<Vec<BucketApp>> {
         let mut apps = Vec::new();
-        let mut reader = tokio::fs::read_dir(self.path().join("bucket")).await?;
-        while let Ok(Some(entry)) = reader.next_entry().await {
-            let app = BucketApp {
-                name: entry
-                    .path()
-                    .file_stem()
-                    .unwrap()
-                    .to_string_lossy()
-                    .to_string(),
-                bucket: self,
-            };
-            apps.push(app);
+
+        let mut entries = WalkDir::new(self.path()).filter(|entry| async move {
+            if let Some(true) = entry
+                .path()
+                .file_name()
+                .map(|f| f.to_string_lossy().starts_with('.'))
+            {
+                return Filtering::IgnoreDir;
+            }
+            Filtering::Continue
+        });
+
+        loop {
+            match entries.next().await {
+                Some(Ok(entry)) => println!("file: {}", entry.path().display()),
+                Some(Err(e)) => {
+                    eprintln!("error: {}", e);
+                    break;
+                }
+                None => break,
+            }
         }
+
         Ok(apps)
     }
 }
