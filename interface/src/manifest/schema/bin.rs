@@ -87,23 +87,19 @@ where
     S: Serializer,
 {
     if let Some(bin) = bin {
-        if bin.len() == 1 {
-            serializer.serialize_str(&bin[0].target)
-        } else {
-            let mut seq = serializer.serialize_seq(Some(bin.len()))?;
-            for b in bin {
-                if let Some(args) = &b.args {
-                    let mut vec = vec![&b.target, &b.name];
-                    for arg in args {
-                        vec.push(arg);
-                    }
-                    seq.serialize_element(&vec)?;
-                } else {
-                    seq.serialize_element(&[&b.target, &b.name])?;
+        let mut seq = serializer.serialize_seq(Some(bin.len()))?;
+        for b in bin {
+            if let Some(args) = &b.args {
+                let mut vec = vec![&b.target, &b.name];
+                for arg in args {
+                    vec.push(arg);
                 }
+                seq.serialize_element(&vec)?;
+            } else {
+                seq.serialize_element(&[&b.target, &b.name])?;
             }
-            seq.end()
         }
+        seq.end()
     } else {
         serializer.serialize_none()
     }

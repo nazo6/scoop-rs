@@ -5,14 +5,18 @@ use std::collections::HashMap;
 pub mod arch;
 mod bin;
 mod download_url;
+mod persist;
 #[cfg(test)]
 mod test;
 
 pub use bin::Bin;
 use bin::{parse_bin, serialize_bin};
 pub use download_url::DownloadUrl;
+use persist::{parse_persist, serialize_persist};
 
 use crate::bucket_app::BucketAppName;
+
+use self::persist::Persist;
 
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -58,11 +62,11 @@ pub struct Manifest {
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub notes: Option<Vec<String>>,
     #[serde(
-        deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin",
+        deserialize_with = "parse_persist",
+        serialize_with = "serialize_persist",
         default
     )]
-    pub persist: Option<Vec<Bin>>,
+    pub persist: Option<Vec<Persist>>,
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub post_install: Option<Vec<String>>,
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
@@ -72,7 +76,12 @@ pub struct Manifest {
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub pre_uninstall: Option<Vec<String>>,
     pub psmodule: Option<Psmodule>,
-    pub shortcuts: Option<Vec<Vec<String>>>,
+    #[serde(
+        deserialize_with = "parse_bin",
+        serialize_with = "serialize_bin",
+        default
+    )]
+    pub shortcuts: Option<Vec<Bin>>,
     pub suggest: Option<Suggest>,
     pub uninstaller: Option<Uninstaller>,
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
@@ -117,7 +126,12 @@ pub struct ArchManifest {
     pub pre_install: Option<Vec<String>>,
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub pre_uninstall: Option<Vec<String>>,
-    pub shortcuts: Option<Vec<Vec<String>>>,
+    #[serde(
+        deserialize_with = "parse_bin",
+        serialize_with = "serialize_bin",
+        default
+    )]
+    pub shortcuts: Option<Vec<Bin>>,
     pub uninstaller: Option<Uninstaller>,
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub url: Option<Vec<DownloadUrl>>,
@@ -226,11 +240,11 @@ pub struct Autoupdate {
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub notes: Option<Vec<String>>,
     #[serde(
-        deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin",
+        deserialize_with = "parse_persist",
+        serialize_with = "serialize_persist",
         default
     )]
-    pub persist: Option<Vec<Bin>>,
+    pub persist: Option<Vec<Persist>>,
     pub psmodule: Option<Psmodule>,
     pub shortcuts: Option<Vec<Vec<String>>>,
     // Don't use DownloadUrl, because this is not complete url
