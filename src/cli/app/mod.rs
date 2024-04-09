@@ -4,6 +4,7 @@ use super::CliResult;
 
 pub mod install;
 mod list;
+pub mod search;
 pub mod uninstall;
 pub mod upgrade;
 
@@ -27,6 +28,10 @@ enum AppCommand {
     #[command(visible_alias("u"))]
     Upgrade(upgrade::UpgradeArgs),
 
+    /// Upgrade apps.
+    #[command(visible_alias("s"))]
+    Search(search::SearchArgs),
+
     /// Show list of installed apps
     List,
 }
@@ -36,6 +41,7 @@ pub async fn start(opts: AppArgs) -> CliResult {
         AppCommand::Install(args) => install::start(args).await,
         AppCommand::Uninstall(args) => uninstall::start(args).await,
         AppCommand::Upgrade(args) => upgrade::start(args).await,
+        AppCommand::Search(args) => search::start(args).await,
         AppCommand::List => list::start().await,
     }
 }

@@ -1,6 +1,7 @@
 mod schema;
 use std::str::FromStr;
 
+pub use schema::arch::*;
 pub use schema::*;
 
 use crate::{error::Result, Context as _};

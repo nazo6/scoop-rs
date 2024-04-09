@@ -1,7 +1,11 @@
+use std::collections::HashSet;
+
 use async_walkdir::{Filtering, WalkDir};
+use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
+use crate::utils::get_stem;
 use crate::val::INSTALL_PATH;
 
 use super::bucket_app::BucketApp;
@@ -39,8 +43,8 @@ impl Bucket {
     }
 
     /// Get list of apps in the bucket
-    pub async fn apps(&self) -> Result<Vec<BucketApp>> {
-        let mut apps = Vec::new();
+    pub async fn apps(&self) -> Result<HashSet<BucketApp>> {
+        let mut apps = HashSet::new();
 
         let mut entries = WalkDir::new(self.path()).filter(|entry| async move {
             if let Some(true) = entry
@@ -55,7 +59,20 @@ impl Bucket {
 
         loop {
             match entries.next().await {
-                Some(Ok(entry)) => println!("file: {}", entry.path().display()),
+                Some(Ok(entry)) => {
+                    if let Ok(true) = entry.file_type().await.map(|f| f.is_file()) {
+                        let name = entry.file_name();
+                        let name = name.to_string_lossy();
+                        let (name, ext) = get_stem(&name);
+                        if ext == Some("json") {
+                            apps.insert(BucketApp {
+                                name: name.to_string(),
+                                metadata_path: entry.path().to_path_buf(),
+                                bucket: self,
+                            });
+                        }
+                    }
+                }
                 Some(Err(e)) => {
                     eprintln!("error: {}", e);
                     break;

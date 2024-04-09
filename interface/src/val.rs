@@ -11,3 +11,12 @@ pub static INSTALL_PATH: Lazy<PathBuf> = Lazy::new(|| {
         path
     }
 });
+
+pub static CACHE_PATH: Lazy<PathBuf> = Lazy::new(|| {
+    let mut path = INSTALL_PATH.clone();
+    path.push("cache");
+    if !path.exists() {
+        std::fs::create_dir_all(&path).expect("Failed to create cache directory");
+    }
+    path
+});

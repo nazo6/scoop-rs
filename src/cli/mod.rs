@@ -25,9 +25,12 @@ enum Command {
     #[command(visible_alias("up"))]
     Upgrade(app::upgrade::UpgradeArgs),
 
-    /// update buckets. this is alias of `bucket update`
+    /// Update buckets. This is alias of `bucket update`
     #[command(visible_alias("u"))]
     Update(bucket::update::UpdateArgs),
+
+    /// Search apps. This is alias of `app search`
+    Search(app::search::SearchArgs),
 
     /// Manage apps
     App(app::AppArgs),
@@ -44,6 +47,7 @@ pub async fn start() {
         Command::Uninstall(args) => app::uninstall::start(args).await,
         Command::Upgrade(args) => app::upgrade::start(args).await,
         Command::Update(args) => bucket::update::start(args).await,
+        Command::Search(args) => app::search::start(args).await,
         Command::App(args) => app::start(args).await,
         Command::Bucket(args) => bucket::start(args).await,
     };

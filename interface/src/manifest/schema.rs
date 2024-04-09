@@ -2,49 +2,49 @@ use serde::{Deserialize, Serialize};
 use serde_with::{formats::PreferOne, serde_as, OneOrMany};
 use std::collections::HashMap;
 
+pub mod arch;
 mod bin;
+mod download_url;
 #[cfg(test)]
 mod test;
 
 pub use bin::Bin;
 use bin::{parse_bin, serialize_bin};
+pub use download_url::DownloadUrl;
+
+use crate::bucket_app::BucketAppName;
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Manifest {
     #[serde(rename = "$schema")]
     pub schema: Option<String>,
     /// _comment is Deprecated. Use ## instead.
     #[serde(alias = "##")]
     #[serde(alias = "_comment")]
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub comment: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub comment: Option<Vec<String>>,
     pub architecture: Option<ManifestArchitecture>,
     pub autoupdate: Option<Autoupdate>,
     #[serde(
-        default,
         deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin"
+        serialize_with = "serialize_bin",
+        default
     )]
-    pub bin: Vec<Bin>,
+    pub bin: Option<Vec<Bin>>,
     pub checkver: Option<Checkver>,
     /// Undocumented: Found at https://github.com/se35710/scoop-java/search?l=JSON&q=cookie
     pub cookie: Option<HashMap<String, Option<serde_json::Value>>>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub depends: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub depends: Option<Vec<BucketAppName>>,
     pub description: Option<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub env_add_path: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub env_add_path: Option<Vec<String>>,
     pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub extract_dir: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub extract_to: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub extract_dir: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub extract_to: Option<Vec<String>>,
     pub hash: Option<Hash>,
     pub homepage: String,
     /// True if the installer InnoSetup based. Found in
@@ -53,41 +53,34 @@ pub struct Manifest {
     pub installer: Option<ManifestInstaller>,
     pub license: License,
     /// Deprecated
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub msi: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub notes: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub msi: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub notes: Option<Vec<String>>,
     #[serde(
-        default,
         deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin"
+        serialize_with = "serialize_bin",
+        default
     )]
-    pub persist: Vec<Bin>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub post_install: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub post_uninstall: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub pre_install: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub pre_uninstall: Vec<String>,
+    pub persist: Option<Vec<Bin>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub post_install: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub post_uninstall: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub pre_install: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub pre_uninstall: Option<Vec<String>>,
     pub psmodule: Option<Psmodule>,
     pub shortcuts: Option<Vec<Vec<String>>>,
     pub suggest: Option<Suggest>,
     pub uninstaller: Option<Uninstaller>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub url: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub url: Option<Vec<DownloadUrl>>,
     pub version: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ManifestArchitecture {
     #[serde(rename = "32bit")]
     pub the_32_bit: Option<ArchManifest>,
@@ -97,48 +90,40 @@ pub struct ManifestArchitecture {
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct ArchManifest {
     #[serde(
-        default,
         deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin"
+        serialize_with = "serialize_bin",
+        default
     )]
-    pub bin: Vec<Bin>,
+    pub bin: Option<Vec<Bin>>,
     pub checkver: Option<Checkver>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub env_add_path: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub env_add_path: Option<Vec<String>>,
     pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub extract_dir: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub extract_dir: Option<Vec<String>>,
     pub hash: Option<Hash>,
     pub installer: Option<ManifestInstaller>,
     /// Deprecated
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub msi: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub post_install: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub post_uninstall: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub pre_install: Vec<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub pre_uninstall: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub msi: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub post_install: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub post_uninstall: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub pre_install: Option<Vec<String>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub pre_uninstall: Option<Vec<String>>,
     pub shortcuts: Option<Vec<Vec<String>>>,
     pub uninstaller: Option<Uninstaller>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub url: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub url: Option<Vec<DownloadUrl>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum Checkver {
     CheckverClass(Box<CheckverClass>),
@@ -146,14 +131,14 @@ pub enum Checkver {
     String(String),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum CheckverTemplate {
     Github,
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CheckverClass {
     pub github: Option<String>,
     /// Same as 'jsonpath'
@@ -167,29 +152,28 @@ pub struct CheckverClass {
     /// Reverse the order of regex matches
     pub reverse: Option<bool>,
     /// Custom PowerShell script to retrieve application version using more complex approach.
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub script: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub script: Option<Vec<String>>,
     pub sourceforge: Option<CheckVerSourceforge>,
     pub url: Option<String>,
     pub useragent: Option<String>,
     pub xpath: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum CheckVerSourceforge {
     SourceforgeClass(SourceforgeDetail),
     String(String),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SourceforgeDetail {
     pub path: Option<String>,
     pub project: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum Hash {
     String(String),
@@ -197,71 +181,64 @@ pub enum Hash {
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ManifestInstaller {
     /// Undocumented: only used in scoop-extras/oraclejdk* and scoop-extras/appengine-go
     #[serde(rename = "_comment")]
     pub comment: Option<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub args: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub args: Option<Vec<String>>,
     pub file: Option<String>,
     pub keep: Option<bool>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub script: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub script: Option<Vec<String>>,
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Uninstaller {
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub args: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub args: Option<Vec<String>>,
     pub file: Option<String>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub script: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub script: Option<Vec<String>>,
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Autoupdate {
     pub architecture: Option<AutoupdateArchitecture>,
     #[serde(
-        default,
         deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin"
+        serialize_with = "serialize_bin",
+        default
     )]
-    pub bin: Vec<Bin>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub env_add_path: Vec<String>,
+    pub bin: Option<Vec<Bin>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub env_add_path: Option<Vec<String>>,
     pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub extract_dir: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub extract_dir: Option<Vec<String>>,
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub hash: Option<Vec<HashExtraction>>,
     pub installer: Option<Installer>,
     pub license: Option<License>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub notes: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub notes: Option<Vec<String>>,
     #[serde(
-        default,
         deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin"
+        serialize_with = "serialize_bin",
+        default
     )]
-    pub persist: Vec<Bin>,
+    pub persist: Option<Vec<Bin>>,
     pub psmodule: Option<Psmodule>,
     pub shortcuts: Option<Vec<Vec<String>>>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub url: Vec<String>,
+    // Don't use DownloadUrl, because this is not complete url
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub url: Option<Vec<String>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AutoupdateArchitecture {
     #[serde(rename = "32bit")]
     pub the_32_bit: Option<AutoupdateArch>,
@@ -271,31 +248,28 @@ pub struct AutoupdateArchitecture {
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AutoupdateArch {
     #[serde(
-        default,
         deserialize_with = "parse_bin",
-        serialize_with = "serialize_bin"
+        serialize_with = "serialize_bin",
+        default
     )]
-    pub bin: Vec<Bin>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub env_add_path: Vec<String>,
+    pub bin: Option<Vec<Bin>>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub env_add_path: Option<Vec<String>>,
     pub env_set: Option<HashMap<String, Option<serde_json::Value>>>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub extract_dir: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub extract_dir: Option<Vec<String>>,
     #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
     pub hash: Option<Vec<HashExtraction>>,
     pub installer: Option<Installer>,
     pub shortcuts: Option<Vec<Vec<String>>>,
-    #[serde(default)]
-    #[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")]
-    pub url: Vec<String>,
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")]
+    pub url: Option<Vec<String>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct HashExtraction {
     /// "jp" is an alias for "jsonpath"
     #[serde(alias = "jp")]
@@ -314,7 +288,7 @@ pub struct HashExtraction {
 }
 
 /// Deprecated, hash type is determined automatically
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum HashExtractionType {
     Md5,
@@ -323,7 +297,7 @@ pub enum HashExtractionType {
     Sha512,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum HashExtractionMode {
     Download,
@@ -336,30 +310,30 @@ pub enum HashExtractionMode {
     Xpath,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Installer {
     pub file: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum License {
     Details(DetailedLicense),
     String(String),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DetailedLicense {
     pub identifier: Option<String>,
     pub url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Psmodule {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum Suggest {
     Array(Suggested),
@@ -367,5 +341,7 @@ pub enum Suggest {
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
-pub struct Suggested(#[serde_as(deserialize_as = "OneOrMany<_, PreferOne>")] pub Vec<String>);
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Suggested(
+    #[serde_as(deserialize_as = "Option<OneOrMany<_, PreferOne>>")] pub Option<Vec<BucketAppName>>,
+);
