@@ -7,7 +7,7 @@ pub static INSTALL_PATH: Lazy<PathBuf> = Lazy::new(|| {
         PathBuf::from(path)
     } else {
         let mut path = dirs::home_dir().expect("Failed to get home directory");
-        path.push("scoop-rs");
+        path.push("scoop");
         path
     }
 });

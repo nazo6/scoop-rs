@@ -1,14 +1,14 @@
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("IO error: {0}")]
+    #[error("IO error:\n\t{0}")]
     Io(#[from] std::io::Error),
-    #[error("Failed to parse manifest json: {0}")]
+    #[error("Failed to parse manifest json:\n\t{0}")]
     ManifestParse(#[source] serde_json::Error),
-    #[error("Failed to parse {0} json: {1}")]
+    #[error("Failed to parse {0} json:\n\t{1}")]
     JsonParse(&'static str, #[source] serde_json::Error),
-    #[error("Invalid state: {0}")]
+    #[error("Invalid state:\n\t{0}")]
     InvalidState(String),
-    #[error("{0}: {1}")]
+    #[error("{0}:\n\t{1}")]
     WithContext(String, Box<Error>),
 }
 

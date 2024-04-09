@@ -3,12 +3,12 @@ use std::str::FromStr;
 
 pub use schema::*;
 
-use crate::error::Result;
+use crate::{error::Result, Context as _};
 
 impl Manifest {
     pub async fn from_path(path: &std::path::Path) -> Result<Self> {
         let content = tokio::fs::read_to_string(path).await?;
-        Manifest::from_str(&content)
+        Manifest::from_str(&content).with_context(|| format!("In file `{}`", path.display()))
     }
 }
 
