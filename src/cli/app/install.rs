@@ -8,7 +8,13 @@ use interface::{
 use crate::cli::CliResult;
 
 mod download;
+mod env;
+mod installer;
+mod link;
+mod persist;
 mod resolve;
+mod run_script;
+mod shortcut;
 
 #[derive(Debug, Args)]
 pub struct InstallArgs {
@@ -39,7 +45,43 @@ pub async fn start_inner(opts: InstallArgs) -> anyhow::Result<()> {
         install_apps.extend(to_install);
     }
 
+    // TODO: Error handling
     download::download(&install_apps).await;
+
+    for (app, manifest) in install_apps {
+        let arch_m = manifest.architecture_current();
+
+        if let Some(pre_install) = &arch_m.pre_install {
+            run_script::run_script(pre_install)
+                .await
+                .context("Failed to run pre-install script")?;
+        }
+
+        installer::extract(app, &manifest).await?;
+        installer::run_installer(app, &manifest).await?;
+
+        link::link_to_current(app, &manifest.version).await?;
+
+        shortcut::create_shims(app, &manifest).await?;
+        shortcut::create_startmenu_shortcuts(app, &manifest).await?;
+
+        installer::install_psmodule(app, &manifest).await?;
+
+        env::path(app, &manifest).await?;
+        env::set_env(app, &manifest).await?;
+
+        persist::persist(app, &manifest).await?;
+
+        if let Some(post_install) = &arch_m.post_install {
+            run_script::run_script(post_install)
+                .await
+                .context("Failed to run post-install script")?;
+        }
+
+        installer::create_info(app, &manifest).await?;
+
+        println!("Installed {}", app.name);
+    }
 
     Ok(())
 }

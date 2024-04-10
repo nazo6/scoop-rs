@@ -8,12 +8,32 @@ macro_rules! merge {
     };
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum Architecture {
     X86,
     Amd64,
     Arm64,
     None,
 }
+
+static ARCH: Architecture = {
+    #[cfg(target_arch = "x86")]
+    {
+        Architecture::X86
+    }
+    #[cfg(target_arch = "x86_64")]
+    {
+        Architecture::Amd64
+    }
+    #[cfg(target_arch = "aarch64")]
+    {
+        Architecture::Arm64
+    }
+    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64", target_arch = "aarch64")))]
+    {
+        Architecture::None
+    }
+};
 
 impl Manifest {
     /// Get the part of manifest that changes depending on the architecture.
@@ -51,5 +71,10 @@ impl Manifest {
         merge!(m, arch_manifest, url);
 
         arch_manifest
+    }
+
+    /// Same as `architecture`, but for the current architecture.
+    pub fn architecture_current(&self) -> ArchManifest {
+        self.architecture(ARCH)
     }
 }

@@ -18,9 +18,7 @@ pub async fn download<'a>(install_apps: &'a [(&'a BucketApp<'a>, Manifest)]) {
             manifest.version.clone()
         };
 
-        let urls = manifest
-            .architecture(interface::manifest::Architecture::Amd64)
-            .url;
+        let urls = manifest.architecture_current().url;
         let urls = urls.unwrap_or_default();
         let name = app.name.clone();
         let url_count = urls.len();
