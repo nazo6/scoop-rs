@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use clap::{Parser, Subcommand};
 
 mod app;
@@ -42,6 +44,8 @@ enum Command {
 pub async fn start() {
     let cli = Cli::parse();
 
+    let start = Instant::now();
+
     let res: CliResult = match cli.command {
         Command::Install(args) => app::install::start(args).await,
         Command::Uninstall(args) => app::uninstall::start(args).await,
@@ -55,4 +59,7 @@ pub async fn start() {
     if let Err(msg) = res {
         eprintln!("{}{}", console::style("Error: ").red(), msg);
     }
+
+    let elapsed = start.elapsed();
+    println!("Command executed in {:.2} seconds", elapsed.as_secs_f64());
 }

@@ -2,15 +2,15 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
+use crate::dir::INSTALL_DIR;
 use crate::error::{Error, Result};
-use crate::val::INSTALL_PATH;
 use crate::Context as _;
 
 use super::{bucket::Bucket, manifest::Manifest};
 
 pub async fn installed_apps() -> Result<Vec<InstalledApp>> {
     let mut apps = Vec::new();
-    let mut readdir = tokio::fs::read_dir(INSTALL_PATH.clone().join("apps")).await?;
+    let mut readdir = tokio::fs::read_dir(INSTALL_DIR.clone().join("apps")).await?;
     while let Ok(Some(entry)) = readdir.next_entry().await {
         if let Some(name) = entry.file_name().to_str() {
             apps.push(InstalledApp::from_name(name));
@@ -32,20 +32,20 @@ impl InstalledApp {
     }
 
     pub fn path(&self) -> PathBuf {
-        let mut path = INSTALL_PATH.clone();
+        let mut path = INSTALL_DIR.clone();
         path.push("apps");
         path.push(&self.name);
         path
     }
 
     pub async fn is_installed(&self) -> bool {
-        let mut path = INSTALL_PATH.clone();
+        let mut path = INSTALL_DIR.clone();
         path.push(&self.name);
         path.exists()
     }
 
     pub async fn versions(&self) -> Result<Vec<AppVersion>> {
-        let mut path = INSTALL_PATH.clone();
+        let mut path = INSTALL_DIR.clone();
         path.push(&self.name);
         let mut versions = Vec::new();
         let mut readdir = tokio::fs::read_dir(path).await?;

@@ -8,6 +8,8 @@ pub enum Error {
     JsonParse(&'static str, #[source] serde_json::Error),
     #[error("Invalid state:\n\t{0}")]
     InvalidState(String),
+    #[error("Git error:\n\t{0}")]
+    Git(#[from] git2::Error),
     #[error("{0}:\n\t{1}")]
     WithContext(String, Box<Error>),
 }

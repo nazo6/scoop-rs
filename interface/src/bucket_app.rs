@@ -8,7 +8,7 @@ use std::{
 
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 
-use crate::{error::Result, val::INSTALL_PATH};
+use crate::{dir::INSTALL_DIR, error::Result};
 
 use super::{bucket::Bucket, installed_app::InstalledApp, manifest::Manifest};
 
@@ -24,7 +24,7 @@ impl BucketApp<'_> {
     /// Check if the app is installed
     /// If the app is installed, return the InstalledApp
     pub async fn installed(&self) -> Option<InstalledApp> {
-        let mut path = INSTALL_PATH.clone();
+        let mut path = INSTALL_DIR.clone();
         path.push(&self.name);
         if path.exists() {
             Some(InstalledApp::from_name(&self.name))

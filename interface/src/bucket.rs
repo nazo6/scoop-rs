@@ -4,15 +4,17 @@ use async_walkdir::{Filtering, WalkDir};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use crate::error::Result;
-use crate::utils::get_stem;
-use crate::val::INSTALL_PATH;
+use crate::{
+    dir::{BUCKETS_DIR, INSTALL_DIR},
+    error::Result,
+    utils::get_stem,
+};
 
 use super::bucket_app::BucketApp;
 
 pub async fn get_buckets() -> Result<Vec<Bucket>> {
     let mut buckets = Vec::new();
-    let mut reader = tokio::fs::read_dir(INSTALL_PATH.clone().join("buckets")).await?;
+    let mut reader = tokio::fs::read_dir(INSTALL_DIR.clone().join("buckets")).await?;
     while let Ok(Some(entry)) = reader.next_entry().await {
         let bucket = Bucket::from_name(entry.file_name().to_str().unwrap());
         buckets.push(bucket);
@@ -27,19 +29,28 @@ pub struct Bucket {
 }
 
 impl Bucket {
-    pub fn from_name(name: &str) -> Self {
+    /// This is not public because the bucket should be created by cloning a repository
+    pub(crate) fn from_name(name: &str) -> Self {
         Bucket {
             name: name.to_string(),
         }
     }
 
+    /// NOTE: This is a blocking function
+    pub fn new_with_clone(name: &str, url: &str) -> Result<Self> {
+        let _repo = git2::Repository::clone(url, BUCKETS_DIR.join(name))?;
+        Ok(Bucket {
+            name: name.to_string(),
+        })
+    }
+
     pub fn path(&self) -> std::path::PathBuf {
-        INSTALL_PATH.clone().join("buckets").join(&self.name)
+        INSTALL_DIR.clone().join("buckets").join(&self.name)
     }
 
     /// Get the git repository of the bucket
-    pub fn repository(&self) -> std::result::Result<git2::Repository, git2::Error> {
-        git2::Repository::open(self.path())
+    pub fn repository(&self) -> Result<git2::Repository> {
+        Ok(git2::Repository::open(self.path())?)
     }
 
     /// Get list of apps in the bucket
